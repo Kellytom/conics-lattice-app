@@ -53,3 +53,24 @@ h1 {
     fill: black;
     text-anchor: middle;
 }
+
+#functionCards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.function-card {
+    width: 420px;
+    min-width: 320px;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+}
+
+.function-card canvas {
+    width: 100%;
+    height: auto;
+    display: block;
+}
