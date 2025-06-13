@@ -38,20 +38,20 @@ window.addEventListener('DOMContentLoaded', () => {
         const configs = {
             narrow: {
                 // Account for card padding, formula text, table space, etc.
-                paddingAndContent: 120, // 15px padding * 2 + formula + count + table space
-                aspectRatio: 1.25, // width:height ratio (5:4)
-                maxWidth: 600,
-                minWidth: 350,
-                maxHeight: 480,
-                minHeight: 280
+                paddingAndContent: 80, // Reduced further to allow even more space for SVG
+                aspectRatio: 1.15, // width:height ratio (closer to square for better fit)
+                maxWidth: 1000, // Increased from 800
+                minWidth: 550,  // Increased from 450
+                maxHeight: 850, // Increased from 650
+                minHeight: 475  // Increased from 375
             },
             wide: {
-                paddingAndContent: 140, // More space for wider layout
+                paddingAndContent: 100, // More space for wider layout
                 aspectRatio: 2.0, // width:height ratio (2:1)
-                maxWidth: 1000,
-                minWidth: 600,
-                maxHeight: 500,
-                minHeight: 300
+                maxWidth: 1400, // Increased from 1200
+                minWidth: 900,  // Increased from 800
+                maxHeight: 700, // Increased from 600
+                minHeight: 450  // Increased from 400
             }
         };
         
@@ -101,10 +101,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Function to create SVG lattice grid
     function createSVGLattice(svg, width, height) {
-        const leftMargin = 10;
-        const bottomMargin = 10;
+        const leftMargin = 35; // Increased from 10 to make room for y-axis labels
+        const bottomMargin = 25; // Added bottom margin for parabola bottom
+        const topMargin = 10; // Small top margin for breathing room
         const effectiveWidth = width - leftMargin;
-        const effectiveHeight = height - bottomMargin;
+        const effectiveHeight = height - bottomMargin - topMargin;
         
         // Create grid group
         const gridGroup = svg.append('g').attr('class', 'grid');
@@ -115,9 +116,9 @@ window.addEventListener('DOMContentLoaded', () => {
             const x = leftMargin + (i * gridSpacingX);
             gridGroup.append('line')
                 .attr('x1', x)
-                .attr('y1', 0)
+                .attr('y1', topMargin)
                 .attr('x2', x)
-                .attr('y2', effectiveHeight)
+                .attr('y2', height - bottomMargin)
                 .attr('stroke', '#eee')
                 .attr('stroke-width', 0.5);
         }
@@ -125,7 +126,7 @@ window.addEventListener('DOMContentLoaded', () => {
         // Horizontal grid lines
         const gridSpacingY = effectiveHeight / 15;
         for (let i = 0; i <= 15; i++) {
-            const y = i * gridSpacingY;
+            const y = topMargin + (i * gridSpacingY);
             gridGroup.append('line')
                 .attr('x1', leftMargin)
                 .attr('y1', y)
@@ -138,45 +139,46 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Function to create SVG axes with tick marks and labels
     function createSVGAxes(svg, width, height) {
-        const leftMargin = 10;
-        const bottomMargin = 10;
+        const leftMargin = 35; // Increased from 10 to match lattice
+        const bottomMargin = 25; // Added bottom margin to match lattice
+        const topMargin = 10; // Small top margin
         const effectiveWidth = width - leftMargin;
-        const effectiveHeight = height - bottomMargin;
+        const effectiveHeight = height - bottomMargin - topMargin;
         
         const axesGroup = svg.append('g').attr('class', 'axes');
         
-        // X axis
+        // X axis - positioned above the bottom margin
         axesGroup.append('line')
             .attr('x1', 0)
-            .attr('y1', effectiveHeight)
+            .attr('y1', height - bottomMargin)
             .attr('x2', width)
-            .attr('y2', effectiveHeight)
+            .attr('y2', height - bottomMargin)
             .attr('stroke', '#888')
             .attr('stroke-width', 1.5);
             
         // Y axis
         axesGroup.append('line')
             .attr('x1', leftMargin)
-            .attr('y1', 0)
+            .attr('y1', topMargin)
             .attr('x2', leftMargin)
-            .attr('y2', height)
+            .attr('y2', height - bottomMargin)
             .attr('stroke', '#888')
             .attr('stroke-width', 1.5);
         
-        // Axis labels
+        // Axis labels - positioned with proper spacing
         axesGroup.append('text')
             .attr('x', width - 15)
-            .attr('y', effectiveHeight - 3)
+            .attr('y', height - bottomMargin - 5)
             .attr('fill', '#222')
-            .attr('font-size', '10px')
+            .attr('font-size', '12px')
             .attr('font-weight', 'bold')
             .text('x');
             
         axesGroup.append('text')
             .attr('x', leftMargin + 3)
-            .attr('y', 12)
+            .attr('y', topMargin + 10)
             .attr('fill', '#222')
-            .attr('font-size', '10px')
+            .attr('font-size', '12px')
             .attr('font-weight', 'bold')
             .text('y');
         
@@ -188,9 +190,9 @@ window.addEventListener('DOMContentLoaded', () => {
             // Tick mark
             axesGroup.append('line')
                 .attr('x1', x)
-                .attr('y1', effectiveHeight - 2)
+                .attr('y1', height - bottomMargin - 2)
                 .attr('x2', x)
-                .attr('y2', effectiveHeight + 2)
+                .attr('y2', height - bottomMargin + 2)
                 .attr('stroke', '#888')
                 .attr('stroke-width', 1);
             
@@ -198,7 +200,7 @@ window.addEventListener('DOMContentLoaded', () => {
             const xValue = Math.round(-630 + (i * 1260 / 12));
             axesGroup.append('text')
                 .attr('x', x)
-                .attr('y', height - 2)
+                .attr('y', height - bottomMargin + 15)
                 .attr('fill', '#222')
                 .attr('font-size', '8px')
                 .attr('text-anchor', 'middle')
@@ -208,7 +210,7 @@ window.addEventListener('DOMContentLoaded', () => {
         // Y-axis ticks and labels
         const yTickSpacing = effectiveHeight / 8;
         for (let i = 1; i < 8; i++) {
-            const y = effectiveHeight - (i * yTickSpacing);
+            const y = topMargin + effectiveHeight - (i * yTickSpacing);
             
             // Tick mark
             axesGroup.append('line')
@@ -219,14 +221,14 @@ window.addEventListener('DOMContentLoaded', () => {
                 .attr('stroke', '#888')
                 .attr('stroke-width', 1);
             
-            // Label
+            // Label - positioned with more space for visibility
             const yValue = Math.round(i * 500 / 8);
             axesGroup.append('text')
-                .attr('x', 8)
+                .attr('x', leftMargin - 8) // Position relative to left margin
                 .attr('y', y + 3)
                 .attr('fill', '#222')
                 .attr('font-size', '8px')
-                .attr('text-anchor', 'end')
+                .attr('text-anchor', 'end') // Right-align text for better spacing
                 .text(yValue);
         }
     }
@@ -236,11 +238,12 @@ window.addEventListener('DOMContentLoaded', () => {
         const points = [];
         const intersections = [];
         
-        // Reduced margins for better graph visibility
-        const leftMargin = 10;
-        const bottomMargin = 10;
+        // Proper margins for better graph visibility and label space
+        const leftMargin = 35; // Increased for y-axis labels
+        const bottomMargin = 25; // Added for parabola bottom
+        const topMargin = 10; // Small top margin
         const effectiveWidth = width - leftMargin;
-        const effectiveHeight = height - bottomMargin;
+        const effectiveHeight = height - bottomMargin - topMargin;
         
         // Draw the parabola with full x range
         const xMin = -630;
@@ -250,7 +253,7 @@ window.addEventListener('DOMContentLoaded', () => {
             // Scale y to fit better in canvas, increased max y range for more intersections
             if (y >= 0 && y <= 500) {
                 const px = leftMargin + (x * (effectiveWidth / (xMax - xMin)) + effectiveWidth / 2);
-                const py = effectiveHeight - y * (effectiveHeight / 500);
+                const py = topMargin + effectiveHeight - y * (effectiveHeight / 500);
                 points.push({ x: px, y: py, origX: x, origY: y });
             }
         }
@@ -283,7 +286,7 @@ window.addEventListener('DOMContentLoaded', () => {
             const y = (x * x) / a;
             if (Number.isInteger(x) && Number.isInteger(y) && y >= 0 && y <= 500) {
                 const px = leftMargin + (x * (effectiveWidth / (xMax - xMin)) + effectiveWidth / 2);
-                const py = effectiveHeight - y * (effectiveHeight / 500);
+                const py = topMargin + effectiveHeight - y * (effectiveHeight / 500);
                 intersections.push({ x: px, y: py, origX: x, origY: y });
             }
         }

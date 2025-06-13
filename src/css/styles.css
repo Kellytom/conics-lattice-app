@@ -70,7 +70,7 @@ h2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--grid-gap);
-    max-width: 98%;
+    max-width: 100%;
     margin: 0 auto;
 }
 
@@ -137,6 +137,7 @@ h2 {
     width: 100%;
     height: auto;
     display: block;
+    margin: 0 auto; /* Center the SVG horizontally */
     border: 1px solid #ddd;
     border-radius: 4px;
     background-color: #fafafa;
@@ -173,13 +174,13 @@ h2 {
 
 /* CSS Variables for Dynamic SVG Sizing */
 :root {
-    --narrow-card-min-width: 350px;
-    --narrow-card-min-height: 450px;
+    --narrow-card-min-width: 550px;
+    --narrow-card-min-height: 650px;
     --narrow-card-padding: 15px;
-    --wide-card-min-height: 500px;
+    --wide-card-min-height: 700px;
     --wide-card-padding: 20px;
     --grid-gap: 20px;
-    --svg-aspect-ratio-narrow: 1.25; /* 5:4 */
+    --svg-aspect-ratio-narrow: 1.15; /* closer to square */
     --svg-aspect-ratio-wide: 2.0; /* 2:1 */
 }
 
@@ -239,6 +240,28 @@ nav {
 }
 
 /* Responsive adjustments */
+@media (max-width: 1400px) {
+    #narrowCards {
+        max-width: 98%;
+    }
+    
+    .function-card.narrow {
+        min-width: 500px;
+        min-height: 600px;
+    }
+}
+
+@media (max-width: 1200px) {
+    #narrowCards {
+        max-width: 95%;
+    }
+    
+    .function-card.narrow {
+        min-width: 450px;
+        min-height: 550px;
+    }
+}
+
 @media (max-width: 768px) {
     #narrowCards {
         grid-template-columns: 1fr;
@@ -247,26 +270,26 @@ nav {
     }
     
     .function-card.narrow {
-        min-width: 320px;
-        min-height: 400px;
+        min-width: 420px;
+        min-height: 520px;
     }
     
     .function-card.wide {
         padding: 15px;
         width: 98%;
-        min-height: 450px;
+        min-height: 600px;
     }
 }
 
 @media (max-width: 480px) {
     .function-card.narrow {
-        min-width: 280px;
-        min-height: 350px;
+        min-width: 350px;
+        min-height: 450px;
         padding: 12px;
     }
     
     .function-card.wide {
         padding: 12px;
-        min-height: 400px;
+        min-height: 500px;
     }
 }
