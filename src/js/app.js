@@ -1,90 +1,170 @@
-// This file contains the main JavaScript code for the application. It generates the formulas for the conics, calculates the points that intersect the fractional integer lattice, and uses D3.js and Chart.js to visualize the grid lattice and the points on the parabola.
+// This file contains the main JavaScript code for the application. It generates the formulas for the conics, calculates the points that intersect the fractional integer lattice, and uses D3.js to visualize the grid lattice and the points on the parabola with crisp SVG graphics.
 
 window.addEventListener('DOMContentLoaded', () => {
-    // Function to draw the lattice on a given context
-    function drawLattice(ctx, width, height) {
-        ctx.clearRect(0, 0, width, height);
+    // Add delay to ensure D3.js is fully loaded and DOM is ready
+    setTimeout(() => {
+        // Test if D3.js is loaded
+        try {
+            console.log('D3 version:', d3.version);
+            if (!d3) {
+                throw new Error('D3.js is not available');
+            }
+        } catch (error) {
+            console.error('D3.js is not loaded!', error);
+            document.getElementById('functionCards').innerHTML = '<p style="color: red; text-align: center; padding: 20px;">Error: D3.js library failed to load. Please refresh the page.</p>';
+            return;
+        }
         
-        // Reduced margins for better graph visibility
+        console.log('Starting application initialization...');
+        
+        // Hide loading indicator
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'none';
+        }
+        
+        // Initialize the application
+        try {
+            init();
+        } catch (error) {
+            console.error('Error initializing application:', error);
+            document.getElementById('functionCards').innerHTML = '<p style="color: red; text-align: center; padding: 20px;">Error initializing application. Check console for details.</p>';
+        }
+    }, 1000); // 1 second delay to ensure everything is loaded
+    
+    // Function to create SVG lattice grid
+    function createSVGLattice(svg, width, height) {
         const leftMargin = 10;
         const bottomMargin = 10;
+        const effectiveWidth = width - leftMargin;
+        const effectiveHeight = height - bottomMargin;
         
-        ctx.beginPath();
-        ctx.strokeStyle = '#eee'; // Lighter grid lines
-        ctx.lineWidth = 0.5;
+        // Create grid group
+        const gridGroup = svg.append('g').attr('class', 'grid');
         
-        // Vertical grid lines (use fewer lines for cleaner look)
-        const gridSpacingX = (width - leftMargin) / 20;
-        for (let x = leftMargin; x <= width; x += gridSpacingX) {
-            ctx.moveTo(x, 0);
-            ctx.lineTo(x, height - bottomMargin);
+        // Vertical grid lines
+        const gridSpacingX = effectiveWidth / 20;
+        for (let i = 0; i <= 20; i++) {
+            const x = leftMargin + (i * gridSpacingX);
+            gridGroup.append('line')
+                .attr('x1', x)
+                .attr('y1', 0)
+                .attr('x2', x)
+                .attr('y2', effectiveHeight)
+                .attr('stroke', '#eee')
+                .attr('stroke-width', 0.5);
         }
         
         // Horizontal grid lines
-        const gridSpacingY = (height - bottomMargin) / 15;
-        for (let y = 0; y <= height - bottomMargin; y += gridSpacingY) {
-            ctx.moveTo(leftMargin, y);
-            ctx.lineTo(width, y);
+        const gridSpacingY = effectiveHeight / 15;
+        for (let i = 0; i <= 15; i++) {
+            const y = i * gridSpacingY;
+            gridGroup.append('line')
+                .attr('x1', leftMargin)
+                .attr('y1', y)
+                .attr('x2', width)
+                .attr('y2', y)
+                .attr('stroke', '#eee')
+                .attr('stroke-width', 0.5);
         }
-        
-        ctx.stroke();
     }
 
-    // Function to draw axes with tick marks and labels for full range
-    function drawAxes(ctx, width, height) {
-        ctx.save();
-        ctx.strokeStyle = '#888';
-        ctx.lineWidth = 1.5;
-        
-        // Reduced margins for better graph visibility
+    // Function to create SVG axes with tick marks and labels
+    function createSVGAxes(svg, width, height) {
         const leftMargin = 10;
         const bottomMargin = 10;
+        const effectiveWidth = width - leftMargin;
+        const effectiveHeight = height - bottomMargin;
+        
+        const axesGroup = svg.append('g').attr('class', 'axes');
         
         // X axis
-        ctx.beginPath();
-        ctx.moveTo(0, height - bottomMargin);
-        ctx.lineTo(width, height - bottomMargin);
-        ctx.stroke();
+        axesGroup.append('line')
+            .attr('x1', 0)
+            .attr('y1', effectiveHeight)
+            .attr('x2', width)
+            .attr('y2', effectiveHeight)
+            .attr('stroke', '#888')
+            .attr('stroke-width', 1.5);
+            
         // Y axis
-        ctx.beginPath();
-        ctx.moveTo(leftMargin, 0);
-        ctx.lineTo(leftMargin, height);
-        ctx.stroke();
+        axesGroup.append('line')
+            .attr('x1', leftMargin)
+            .attr('y1', 0)
+            .attr('x2', leftMargin)
+            .attr('y2', height)
+            .attr('stroke', '#888')
+            .attr('stroke-width', 1.5);
         
-        // Smaller axis labels
-        ctx.fillStyle = '#222';
-        ctx.font = 'bold 10px Arial';
-        ctx.fillText('x', width - 15, height - bottomMargin - 3);
-        ctx.fillText('y', leftMargin + 3, 12);
+        // Axis labels
+        axesGroup.append('text')
+            .attr('x', width - 15)
+            .attr('y', effectiveHeight - 3)
+            .attr('fill', '#222')
+            .attr('font-size', '10px')
+            .attr('font-weight', 'bold')
+            .text('x');
+            
+        axesGroup.append('text')
+            .attr('x', leftMargin + 3)
+            .attr('y', 12)
+            .attr('fill', '#222')
+            .attr('font-size', '10px')
+            .attr('font-weight', 'bold')
+            .text('y');
         
-        // Draw x-axis ticks and labels for full range
-        ctx.font = '8px Arial';
-        const xTickSpacing = width / 12;
+        // X-axis ticks and labels
+        const xTickSpacing = effectiveWidth / 12;
         for (let i = 1; i < 12; i++) {
-            const x = i * xTickSpacing;
-            ctx.beginPath();
-            ctx.moveTo(x, height - bottomMargin - 2);
-            ctx.lineTo(x, height - bottomMargin + 2);
-            ctx.stroke();
+            const x = leftMargin + (i * xTickSpacing);
+            
+            // Tick mark
+            axesGroup.append('line')
+                .attr('x1', x)
+                .attr('y1', effectiveHeight - 2)
+                .attr('x2', x)
+                .attr('y2', effectiveHeight + 2)
+                .attr('stroke', '#888')
+                .attr('stroke-width', 1);
+            
+            // Label
             const xValue = Math.round(-630 + (i * 1260 / 12));
-            ctx.fillText(`${xValue}`, x - 10, height - 2);
+            axesGroup.append('text')
+                .attr('x', x)
+                .attr('y', height - 2)
+                .attr('fill', '#222')
+                .attr('font-size', '8px')
+                .attr('text-anchor', 'middle')
+                .text(xValue);
         }
         
-        // Draw y-axis ticks and labels for increased range
-        const yTickSpacing = height / 8;
+        // Y-axis ticks and labels
+        const yTickSpacing = effectiveHeight / 8;
         for (let i = 1; i < 8; i++) {
-            const y = height - (i * yTickSpacing);
-            ctx.beginPath();
-            ctx.moveTo(leftMargin - 2, y);
-            ctx.lineTo(leftMargin + 2, y);
-            ctx.stroke();
+            const y = effectiveHeight - (i * yTickSpacing);
+            
+            // Tick mark
+            axesGroup.append('line')
+                .attr('x1', leftMargin - 2)
+                .attr('y1', y)
+                .attr('x2', leftMargin + 2)
+                .attr('y2', y)
+                .attr('stroke', '#888')
+                .attr('stroke-width', 1);
+            
+            // Label
             const yValue = Math.round(i * 500 / 8);
-            ctx.fillText(`${yValue}`, 1, y + 3);
+            axesGroup.append('text')
+                .attr('x', 8)
+                .attr('y', y + 3)
+                .attr('fill', '#222')
+                .attr('font-size', '8px')
+                .attr('text-anchor', 'end')
+                .text(yValue);
         }
-        ctx.restore();
     }
 
-    // Efficient math-based lattice intersection calculation
+    // SVG-based lattice intersection calculation
     function calculateParabolaLatticeIntersections(a, width, height) {
         const points = [];
         const intersections = [];
@@ -143,60 +223,57 @@ window.addEventListener('DOMContentLoaded', () => {
         return { points, intersections, xMin, xMax };
     }
 
-    // Function to calculate points on the parabola
-    function calculateParabola(a, width, height) {
-        const points = [];
-        for (let x = -width / 2; x <= width / 2; x++) {
-            const y = (x * x) / a;
-            if (y >= 0 && y <= height) {
-                points.push({ x: x + width / 2, y: height - y });
-            }
-        }
-        return points;
-    }
-
-    // Function to draw the parabola and label intersections
-    function drawParabola(ctx, a, color, width, height) {
+    // Function to draw SVG parabola and label intersections
+    function drawSVGParabola(svg, a, color, width, height) {
         const { points, intersections } = calculateParabolaLatticeIntersections(a, width, height);
         if (points.length === 0) return { points: [], intersections: [] };
         
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, points[0].y);
-        points.forEach(point => {
-            ctx.lineTo(point.x, point.y);
-        });
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 2;
-        ctx.stroke();
+        // Create parabola path
+        const line = d3.line()
+            .x(d => d.x)
+            .y(d => d.y)
+            .curve(d3.curveCardinal);
         
-        // Draw smaller intersection points and labels
+        const parabolaGroup = svg.append('g').attr('class', 'parabola');
+        
+        // Draw parabola curve
+        parabolaGroup.append('path')
+            .datum(points)
+            .attr('d', line)
+            .attr('fill', 'none')
+            .attr('stroke', color)
+            .attr('stroke-width', 2)
+            .attr('stroke-linejoin', 'round')
+            .attr('stroke-linecap', 'round');
+        
+        // Draw intersection points and labels
+        const intersectionGroup = svg.append('g').attr('class', 'intersections');
+        
         intersections.forEach(pt => {
-            ctx.beginPath();
-            ctx.arc(pt.x, pt.y, 2.5, 0, 2 * Math.PI); // Reduced from 5 to 2.5
-            ctx.fillStyle = 'red';
-            ctx.fill();
+            // Draw red dot
+            intersectionGroup.append('circle')
+                .attr('cx', pt.x)
+                .attr('cy', pt.y)
+                .attr('r', 2.5)
+                .attr('fill', 'red')
+                .attr('stroke', 'darkred')
+                .attr('stroke-width', 0.5);
             
-            // Smaller font for labels
-            ctx.font = '8px Arial'; // Reduced from 12px to 8px
-            ctx.fillStyle = 'black';
+            // Position labels: negative x values on left, positive on right
+            const isNegative = pt.origX < 0;
+            const labelX = isNegative ? pt.x - 4 : pt.x + 4;
+            const textAnchor = isNegative ? 'end' : 'start';
             
-            const label = `(${Math.round(pt.origX)}, ${Math.round(pt.origY)})`;
-            const labelWidth = ctx.measureText(label).width;
-            
-            // Position labels: negative x on left, positive x on right
-            let labelX, labelY;
-            if (pt.origX < 0) {
-                // Negative x: position label to the left of the point
-                labelX = pt.x - labelWidth - 5;
-                labelY = pt.y - 4;
-            } else {
-                // Positive x: position label to the right of the point
-                labelX = pt.x + 4;
-                labelY = pt.y - 4;
-            }
-            
-            ctx.fillText(label, labelX, labelY);
+            intersectionGroup.append('text')
+                .attr('x', labelX)
+                .attr('y', pt.y - 4)
+                .attr('fill', 'black')
+                .attr('font-size', '8px')
+                .attr('font-family', 'Arial, sans-serif')
+                .attr('text-anchor', textAnchor)
+                .text(`(${Math.round(pt.origX)}, ${Math.round(pt.origY)})`);
         });
+        
         return { points, intersections };
     }
 
@@ -210,9 +287,17 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Main function to initialize the application
     function init() {
+        console.log('Init function called');
+        
         // Create containers for narrow and wide cards
         const functionCards = document.getElementById('functionCards');
+        if (!functionCards) {
+            console.error('functionCards element not found!');
+            return;
+        }
+        
         functionCards.innerHTML = '';
+        console.log('Cleared functionCards');
         
         // Narrow cards section
         const narrowHeader = document.createElement('h2');
@@ -221,6 +306,7 @@ window.addEventListener('DOMContentLoaded', () => {
         const narrowContainer = document.createElement('div');
         narrowContainer.id = 'narrowCards';
         functionCards.appendChild(narrowContainer);
+        console.log('Created narrow section');
         
         // Wide cards section
         const wideHeader = document.createElement('h2');
@@ -230,6 +316,7 @@ window.addEventListener('DOMContentLoaded', () => {
         const wideContainer = document.createElement('div');
         wideContainer.id = 'wideCards';
         functionCards.appendChild(wideContainer);
+        console.log('Created wide section');
         
         // Values
         const narrowValues = [
@@ -243,14 +330,24 @@ window.addEventListener('DOMContentLoaded', () => {
             2704, 2809, 2916, 3025, 3136
         ];
         // Render into separate containers
+        console.log('About to render narrow cards, values:', narrowValues.length);
         displayFunctionCards(narrowValues, 'narrow', narrowContainer);
+        console.log('About to render wide cards, values:', wideValues.length);
         displayFunctionCards(wideValues, 'wide', wideContainer);
+        console.log('Finished rendering all cards');
     }
 
     // Function to create a card for each function
     function displayFunctionCards(aValues, cardType = 'narrow', container = null) {
+        console.log(`displayFunctionCards called with ${aValues.length} values for ${cardType} cards`);
+        
         const parent = container || document.getElementById('functionCards');
         const colors = ['blue', 'green', 'red', 'purple', 'orange', 'brown', 'pink', 'gray', 'olive', 'navy'];
+        
+        if (!parent) {
+            console.error('Parent container not found!');
+            return;
+        }
         
         aValues.forEach((a, idx) => {
             // Create card
@@ -260,21 +357,36 @@ window.addEventListener('DOMContentLoaded', () => {
             if (cardType === 'narrow') {
                 card.style.display = 'block';
                 
-                // Create smaller canvas for grid layout
-                const canvas = document.createElement('canvas');
-                canvas.width = 250;
-                canvas.height = 200;
-                canvas.style.display = 'block';
-                canvas.style.marginBottom = '10px';
-                canvas.style.width = '100%';
-                canvas.style.height = 'auto';
-                card.appendChild(canvas);
+                // Create SVG for crisp graphics
+                const svgWidth = 400;
+                const svgHeight = 320;
+                const svg = d3.select(card)
+                    .append('svg')
+                    .attr('width', svgWidth)
+                    .attr('height', svgHeight)
+                    .style('width', '100%')
+                    .style('height', 'auto')
+                    .style('display', 'block')
+                    .style('margin-bottom', '10px')
+                    .style('background-color', '#fafafa')
+                    .style('border', '1px solid #ddd')
+                    .style('border-radius', '4px');
                 
-                // Draw on canvas
-                const ctx = canvas.getContext('2d');
-                drawLattice(ctx, canvas.width, canvas.height);
-                drawAxes(ctx, canvas.width, canvas.height);
-                const { points, intersections } = drawParabola(ctx, a, colors[idx % colors.length], canvas.width, canvas.height);
+                // Draw SVG elements with error handling
+                let intersections = [];
+                try {
+                    console.log('Creating lattice for narrow card', idx, 'with a =', a);
+                    createSVGLattice(svg, svgWidth, svgHeight);
+                    createSVGAxes(svg, svgWidth, svgHeight);
+                    const result = drawSVGParabola(svg, a, colors[idx % colors.length], svgWidth, svgHeight);
+                    intersections = result.intersections || [];
+                    console.log('Narrow card created with', intersections.length, 'intersections');
+                } catch (error) {
+                    console.error('Error creating narrow SVG elements:', error);
+                    svg.append('rect')
+                        .attr('x', 10).attr('y', 10).attr('width', svgWidth - 20).attr('height', svgHeight - 20)
+                        .attr('fill', 'none').attr('stroke', 'red').attr('stroke-width', 2);
+                }
                 
                 // Add formula and info with improved font sizes
                 const formula = document.createElement('div');
@@ -313,19 +425,36 @@ window.addEventListener('DOMContentLoaded', () => {
                 card.style.margin = '20px 0';
                 card.style.width = '100%';
                 
-                // Create full-width canvas
-                const canvas = document.createElement('canvas');
-                canvas.width = 800;
-                canvas.height = 400;
-                canvas.style.display = 'block';
-                canvas.style.marginBottom = '10px';
-                card.appendChild(canvas);
+                // Create full-width SVG for crisp graphics
+                const svgWidth = 800;
+                const svgHeight = 400;
+                const svg = d3.select(card)
+                    .append('svg')
+                    .attr('width', svgWidth)
+                    .attr('height', svgHeight)
+                    .style('width', '100%')
+                    .style('height', 'auto')
+                    .style('display', 'block')
+                    .style('margin-bottom', '10px')
+                    .style('background-color', '#fafafa')
+                    .style('border', '1px solid #ddd')
+                    .style('border-radius', '4px');
                 
-                // Draw on canvas
-                const ctx = canvas.getContext('2d');
-                drawLattice(ctx, canvas.width, canvas.height);
-                drawAxes(ctx, canvas.width, canvas.height);
-                const { points, intersections } = drawParabola(ctx, a, colors[idx % colors.length], canvas.width, canvas.height);
+                // Draw SVG elements with error handling
+                let intersections = [];
+                try {
+                    console.log('Creating lattice for wide card', idx, 'with a =', a);
+                    createSVGLattice(svg, svgWidth, svgHeight);
+                    createSVGAxes(svg, svgWidth, svgHeight);
+                    const result = drawSVGParabola(svg, a, colors[idx % colors.length], svgWidth, svgHeight);
+                    intersections = result.intersections || [];
+                    console.log('Wide card created with', intersections.length, 'intersections');
+                } catch (error) {
+                    console.error('Error creating wide SVG elements:', error);
+                    svg.append('rect')
+                        .attr('x', 10).attr('y', 10).attr('width', svgWidth - 20).attr('height', svgHeight - 20)
+                        .attr('fill', 'none').attr('stroke', 'red').attr('stroke-width', 2);
+                }
                 
                 // Add formula and range with improved typography
                 const formula = document.createElement('div');

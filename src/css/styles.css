@@ -70,14 +70,14 @@ h2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
-    max-width: 90%;
+    max-width: 95%;
     margin: 0 auto;
 }
 
 .function-card.narrow {
     width: 100%;
     max-width: none;
-    min-width: 250px;
+    min-width: 300px;
     margin: 0;
     display: block;
     box-sizing: border-box;
@@ -131,7 +131,7 @@ h2 {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.function-card canvas {
+.function-card svg {
     width: 100%;
     height: auto;
     display: block;
@@ -169,15 +169,71 @@ h2 {
     background: #e0e0e0;
 }
 
+/* SVG specific styles for crisp graphics */
+svg {
+    shape-rendering: crispEdges;
+}
+
+svg .grid line {
+    stroke: #eee;
+    stroke-width: 0.5;
+}
+
+svg .axes line {
+    stroke: #888;
+    stroke-width: 1.5;
+}
+
+svg .axes text {
+    fill: #222;
+    font-family: Arial, sans-serif;
+}
+
+svg .parabola path {
+    fill: none;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    shape-rendering: geometricPrecision;
+}
+
+svg .intersections circle {
+    stroke-width: 0.5;
+    stroke: darkred;
+}
+
+svg .intersections text {
+    font-family: Arial, sans-serif;
+    fill: black;
+    dominant-baseline: central;
+}
+
+/* Navigation styles */
+nav {
+    margin-bottom: 20px;
+}
+
+.home-link {
+    color: #667eea;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.home-link:hover {
+    color: #5a6fd8;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     #narrowCards {
         grid-template-columns: 1fr;
         gap: 15px;
+        max-width: 100%;
     }
     
     .function-card.narrow {
-        min-width: 200px;
+        min-width: 280px;
     }
     
     .function-card.wide {

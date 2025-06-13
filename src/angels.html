@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Angels Project - Conics Explorer</title>
+    <link rel="stylesheet" href="css/angels.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="js/angels.js" defer></script>
+</head>
+<body>
+    <div id="app">
+        <nav>
+            <a href="../index.html" class="home-link">← Back to Home</a>
+        </nav>
+        <header>
+            <h1>👼 Angels Project</h1>
+            <p class="subtitle">Mathematical patterns inspired by celestial geometry</p>
+        </header>
+
+        <div id="controls">
+            <div class="control-group">
+                <label for="angleSlider">Angel Wing Angle:</label>
+                <input type="range" id="angleSlider" min="0" max="360" value="60" step="1">
+                <span id="angleValue">60°</span>
+            </div>
+            <div class="control-group">
+                <label for="radiusSlider">Wing Radius:</label>
+                <input type="range" id="radiusSlider" min="50" max="200" value="100" step="5">
+                <span id="radiusValue">100</span>
+            </div>
+            <div class="control-group">
+                <label for="symmetrySlider">Symmetry Order:</label>
+                <input type="range" id="symmetrySlider" min="3" max="12" value="6" step="1">
+                <span id="symmetryValue">6</span>
+            </div>
+            <div class="control-group">
+                <button id="animateBtn">🎭 Animate</button>
+                <button id="resetBtn">🔄 Reset</button>
+            </div>
+        </div>
+
+        <div id="visualization">
+            <svg id="angelCanvas" width="800" height="600"></svg>
+        </div>
+
+        <div id="info">
+            <h3>About the Angels Project</h3>
+            <p>
+                This project explores mathematical patterns through the lens of celestial geometry. 
+                By manipulating angles, radii, and symmetry, we create beautiful patterns that 
+                resemble angel wings and halos, while discovering underlying mathematical relationships.
+            </p>
+            <div class="pattern-info">
+                <h4>Current Pattern Properties:</h4>
+                <div id="patternStats">
+                    <span id="totalPoints">Points: 0</span>
+                    <span id="symmetryInfo">Symmetry: 6-fold</span>
+                    <span id="angleSum">Angle Sum: 360°</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

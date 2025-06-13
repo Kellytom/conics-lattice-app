@@ -1,0 +1,229 @@
+/* Angels Project Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    min-height: 100vh;
+    color: #333;
+}
+
+#app {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+nav {
+    margin-bottom: 20px;
+}
+
+.home-link {
+    color: white;
+    text-decoration: none;
+    font-size: 1.1rem;
+    opacity: 0.9;
+    transition: opacity 0.3s ease;
+}
+
+.home-link:hover {
+    opacity: 1;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+    color: white;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+#controls {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    align-items: center;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.control-group label {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.9rem;
+}
+
+.control-group input[type="range"] {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: #e1e5e9;
+    outline: none;
+    transition: background 0.3s ease;
+}
+
+.control-group input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #667eea;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.control-group input[type="range"]::-webkit-slider-thumb:hover {
+    background: #5a6fd8;
+}
+
+.control-group span {
+    font-weight: bold;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.control-group button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.control-group button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+#visualization {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    text-align: center;
+}
+
+#angelCanvas {
+    border-radius: 10px;
+    background: radial-gradient(circle, #f8f9fa 0%, #e9ecef 100%);
+    border: 2px solid #e1e5e9;
+}
+
+#info {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+#info h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+}
+
+#info p {
+    color: #555;
+    line-height: 1.7;
+    margin-bottom: 20px;
+}
+
+.pattern-info {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    border-left: 4px solid #667eea;
+}
+
+.pattern-info h4 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+#patternStats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+}
+
+#patternStats span {
+    background: white;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    color: #495057;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Angel wing animations */
+.angel-wing {
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 0 5px rgba(102, 126, 234, 0.3));
+}
+
+.angel-wing:hover {
+    filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.6));
+}
+
+.angel-halo {
+    stroke-dasharray: 5,5;
+    animation: rotate 10s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    #controls {
+        grid-template-columns: 1fr;
+        padding: 20px;
+    }
+    
+    #angelCanvas {
+        width: 100%;
+        height: auto;
+        max-width: 600px;
+    }
+    
+    #patternStats {
+        grid-template-columns: 1fr;
+    }
+}
