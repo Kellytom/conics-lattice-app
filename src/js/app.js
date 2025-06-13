@@ -32,6 +32,73 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }, 1000); // 1 second delay to ensure everything is loaded
     
+    // Function to calculate optimal SVG dimensions based on card type and available space
+    function calculateSVGDimensions(cardType, containerElement = null) {
+        // Base configuration for different card types
+        const configs = {
+            narrow: {
+                // Account for card padding, formula text, table space, etc.
+                paddingAndContent: 120, // 15px padding * 2 + formula + count + table space
+                aspectRatio: 1.25, // width:height ratio (5:4)
+                maxWidth: 600,
+                minWidth: 350,
+                maxHeight: 480,
+                minHeight: 280
+            },
+            wide: {
+                paddingAndContent: 140, // More space for wider layout
+                aspectRatio: 2.0, // width:height ratio (2:1)
+                maxWidth: 1000,
+                minWidth: 600,
+                maxHeight: 500,
+                minHeight: 300
+            }
+        };
+        
+        const config = configs[cardType] || configs.narrow;
+        
+        // Try to get actual container dimensions if available
+        let availableWidth = config.maxWidth;
+        let availableHeight = config.maxHeight;
+        
+        if (containerElement) {
+            const containerRect = containerElement.getBoundingClientRect();
+            availableWidth = Math.max(containerRect.width - 30, config.minWidth); // 30px for padding
+        } else {
+            // Estimate based on CSS and viewport
+            const narrowCardContainer = document.querySelector('#narrowCards');
+            if (narrowCardContainer && cardType === 'narrow') {
+                const containerRect = narrowCardContainer.getBoundingClientRect();
+                // Account for grid gap and 2-column layout
+                availableWidth = Math.max((containerRect.width - 20) / 2 - 30, config.minWidth);
+            }
+        }
+        
+        // Calculate optimal dimensions
+        let svgWidth = Math.min(availableWidth, config.maxWidth);
+        svgWidth = Math.max(svgWidth, config.minWidth);
+        
+        // Calculate height based on aspect ratio
+        let svgHeight = svgWidth / config.aspectRatio;
+        
+        // Ensure height constraints
+        svgHeight = Math.min(svgHeight, config.maxHeight);
+        svgHeight = Math.max(svgHeight, config.minHeight);
+        
+        // Adjust width if height was constrained
+        if (svgHeight === config.maxHeight || svgHeight === config.minHeight) {
+            svgWidth = svgHeight * config.aspectRatio;
+        }
+        
+        // Round to avoid subpixel issues
+        svgWidth = Math.round(svgWidth);
+        svgHeight = Math.round(svgHeight);
+        
+        console.log(`SVG dimensions for ${cardType}: ${svgWidth}x${svgHeight} (available: ${availableWidth})`);
+        
+        return { width: svgWidth, height: svgHeight };
+    }
+
     // Function to create SVG lattice grid
     function createSVGLattice(svg, width, height) {
         const leftMargin = 10;
@@ -357,9 +424,10 @@ window.addEventListener('DOMContentLoaded', () => {
             if (cardType === 'narrow') {
                 card.style.display = 'block';
                 
-                // Create SVG for crisp graphics
-                const svgWidth = 400;
-                const svgHeight = 320;
+                // Calculate optimal SVG dimensions dynamically
+                const dimensions = calculateSVGDimensions('narrow', card);
+                const svgWidth = dimensions.width;
+                const svgHeight = dimensions.height;
                 const svg = d3.select(card)
                     .append('svg')
                     .attr('width', svgWidth)
@@ -425,9 +493,10 @@ window.addEventListener('DOMContentLoaded', () => {
                 card.style.margin = '20px 0';
                 card.style.width = '100%';
                 
-                // Create full-width SVG for crisp graphics
-                const svgWidth = 800;
-                const svgHeight = 400;
+                // Calculate optimal SVG dimensions dynamically
+                const dimensions = calculateSVGDimensions('wide', card);
+                const svgWidth = dimensions.width;
+                const svgHeight = dimensions.height;
                 const svg = d3.select(card)
                     .append('svg')
                     .attr('width', svgWidth)
@@ -489,6 +558,43 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Run the application
-    init();
+    // Function to handle responsive SVG resizing
+    function handleResize() {
+        // Debounce resize events to avoid excessive recalculation
+        clearTimeout(window.resizeTimeout);
+        window.resizeTimeout = setTimeout(() => {
+            console.log('Handling window resize - recalculating SVG dimensions');
+            
+            // Re-initialize if the viewport has changed significantly
+            const currentViewportWidth = window.innerWidth;
+            if (Math.abs(currentViewportWidth - (window.lastViewportWidth || 0)) > 100) {
+                window.lastViewportWidth = currentViewportWidth;
+                
+                // Find all existing SVGs and update their dimensions
+                const narrowCards = document.querySelectorAll('.function-card.narrow svg');
+                const wideCards = document.querySelectorAll('.function-card.wide svg');
+                
+                narrowCards.forEach((svg, index) => {
+                    const card = svg.closest('.function-card.narrow');
+                    const dimensions = calculateSVGDimensions('narrow', card);
+                    svg.setAttribute('width', dimensions.width);
+                    svg.setAttribute('height', dimensions.height);
+                    svg.setAttribute('viewBox', `0 0 ${dimensions.width} ${dimensions.height}`);
+                });
+                
+                wideCards.forEach((svg, index) => {
+                    const card = svg.closest('.function-card.wide');
+                    const dimensions = calculateSVGDimensions('wide', card);
+                    svg.setAttribute('width', dimensions.width);
+                    svg.setAttribute('height', dimensions.height);
+                    svg.setAttribute('viewBox', `0 0 ${dimensions.width} ${dimensions.height}`);
+                });
+            }
+        }, 250); // 250ms debounce
+    }
+
+    // Add resize event listener
+    window.addEventListener('resize', handleResize);
+
+    // Function to create SVG lattice grid
 });
