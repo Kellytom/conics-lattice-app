@@ -17,7 +17,7 @@ window.addEventListener('DOMContentLoaded', () => {
         ctx.stroke();
     }
 
-    // Function to draw axes on a given context
+    // Function to draw axes with tick marks but no labels
     function drawAxes(ctx, width, height) {
         ctx.save();
         ctx.strokeStyle = '#888';
@@ -38,27 +38,51 @@ window.addEventListener('DOMContentLoaded', () => {
         ctx.fillText('x', width - 20, height - 25);
         // Y label
         ctx.fillText('y', 25, 25);
+        // Draw x-axis ticks (no labels)
+        for (let x = 60; x < width; x += 60) {
+            ctx.beginPath();
+            ctx.moveTo(x, height - 18);
+            ctx.lineTo(x, height - 22);
+            ctx.stroke();
+        }
+        // Draw y-axis ticks (no labels)
+        for (let y = height - 40; y > 0; y -= 60) {
+            ctx.beginPath();
+            ctx.moveTo(18, y);
+            ctx.lineTo(22, y);
+            ctx.stroke();
+        }
         ctx.restore();
     }
 
-    // Function to calculate points on the parabola and lattice intersections (no duplicate intersections)
-    function calculateParabolaLatticeIntersections(a, width, height, step = 1) {
+    // Robust lattice intersection calculation using math
+    function calculateParabolaLatticeIntersections(a, width, height) {
         const points = [];
         const intersections = [];
         const seen = new Set();
-        // Use a wider and symmetric x range for full coverage
-        const xMin = -width;
-        const xMax = width;
-        for (let x = xMin; x <= xMax; x += step) {
+        // Draw the parabola as before
+        const xMin = -630;
+        const xMax = 630;
+        for (let x = xMin; x <= xMax; x += 0.5) {
             const y = (x * x) / a;
             if (y >= 0 && y <= height) {
                 const px = x + width / 2;
                 const py = height - y;
                 points.push({ x: px, y: py, origX: x, origY: y });
-                // Check for intersection with lattice (within 2px of integer lattice)
-                if (Math.abs((px % 20)) < 2 && Math.abs((py % 20)) < 2) {
-                    // Use rounded lattice coordinates as a key
-                    const key = `${Math.round(px/20)},${Math.round(py/20)}`;
+            }
+        }
+        // Math-based lattice intersections
+        const latticeStep = 20;
+        const kMax = Math.floor(xMax / latticeStep);
+        for (let k = -kMax; k <= kMax; k++) {
+            const x = latticeStep * k;
+            const m = (latticeStep * k * k) / a;
+            if (Number.isInteger(m)) {
+                const y = latticeStep * m;
+                if (y >= 0 && y <= height) {
+                    const px = x + width / 2;
+                    const py = height - y;
+                    const key = `${px},${py}`;
                     if (!seen.has(key)) {
                         intersections.push({ x: px, y: py, origX: x, origY: y });
                         seen.add(key);
@@ -123,10 +147,10 @@ window.addEventListener('DOMContentLoaded', () => {
             // Create card
             const card = document.createElement('div');
             card.className = 'function-card';
-            // Create canvas
+            // Create canvas with more vertical space and adjust y-scaling
             const canvas = document.createElement('canvas');
             canvas.width = 400;
-            canvas.height = 320;
+            canvas.height = 600; // Substantially increased height
             canvas.style.display = 'block';
             canvas.style.marginBottom = '10px';
             card.appendChild(canvas);
@@ -134,8 +158,11 @@ window.addEventListener('DOMContentLoaded', () => {
             const ctx = canvas.getContext('2d');
             drawLattice(ctx, canvas.width, canvas.height);
             drawAxes(ctx, canvas.width, canvas.height);
+            // Move the parabola up by 80px
+            ctx.save();
+            ctx.translate(0, -80); // Move up
             drawParabola(ctx, a, colors[idx % colors.length], canvas.width, canvas.height);
-            labelParabola(ctx, a, colors[idx % colors.length], canvas.width, canvas.height);
+            ctx.restore();
             // Add formula and range below
             const { xMin, xMax } = calculateParabolaLatticeIntersections(a, canvas.width, canvas.height, 0.5);
             const formula = document.createElement('div');
