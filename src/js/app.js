@@ -4,16 +4,29 @@ window.addEventListener('DOMContentLoaded', () => {
     // Function to draw the lattice on a given context
     function drawLattice(ctx, width, height) {
         ctx.clearRect(0, 0, width, height);
+        
+        // Reduced margins for better graph visibility
+        const leftMargin = 10;
+        const bottomMargin = 10;
+        
         ctx.beginPath();
-        for (let x = 0; x <= width; x += 20) {
+        ctx.strokeStyle = '#eee'; // Lighter grid lines
+        ctx.lineWidth = 0.5;
+        
+        // Vertical grid lines (use fewer lines for cleaner look)
+        const gridSpacingX = (width - leftMargin) / 20;
+        for (let x = leftMargin; x <= width; x += gridSpacingX) {
             ctx.moveTo(x, 0);
-            ctx.lineTo(x, height);
+            ctx.lineTo(x, height - bottomMargin);
         }
-        for (let y = 0; y <= height; y += 20) {
-            ctx.moveTo(0, y);
+        
+        // Horizontal grid lines
+        const gridSpacingY = (height - bottomMargin) / 15;
+        for (let y = 0; y <= height - bottomMargin; y += gridSpacingY) {
+            ctx.moveTo(leftMargin, y);
             ctx.lineTo(width, y);
         }
-        ctx.strokeStyle = '#ccc';
+        
         ctx.stroke();
     }
 
@@ -22,44 +35,51 @@ window.addEventListener('DOMContentLoaded', () => {
         ctx.save();
         ctx.strokeStyle = '#888';
         ctx.lineWidth = 1.5;
+        
+        // Reduced margins for better graph visibility
+        const leftMargin = 10;
+        const bottomMargin = 10;
+        
         // X axis
         ctx.beginPath();
-        ctx.moveTo(0, height - 20);
-        ctx.lineTo(width, height - 20);
+        ctx.moveTo(0, height - bottomMargin);
+        ctx.lineTo(width, height - bottomMargin);
         ctx.stroke();
         // Y axis
         ctx.beginPath();
-        ctx.moveTo(20, 0);
-        ctx.lineTo(20, height);
+        ctx.moveTo(leftMargin, 0);
+        ctx.lineTo(leftMargin, height);
         ctx.stroke();
-        // X label
+        
+        // Smaller axis labels
         ctx.fillStyle = '#222';
-        ctx.font = 'bold 14px Arial';
-        ctx.fillText('x', width - 20, height - 25);
-        // Y label
-        ctx.fillText('y', 25, 25);
+        ctx.font = 'bold 10px Arial';
+        ctx.fillText('x', width - 15, height - bottomMargin - 3);
+        ctx.fillText('y', leftMargin + 3, 12);
+        
         // Draw x-axis ticks and labels for full range
-        ctx.font = '11px Arial';
-        const xTickSpacing = width / 12; // More ticks across full range
+        ctx.font = '8px Arial';
+        const xTickSpacing = width / 12;
         for (let i = 1; i < 12; i++) {
             const x = i * xTickSpacing;
             ctx.beginPath();
-            ctx.moveTo(x, height - 18);
-            ctx.lineTo(x, height - 22);
+            ctx.moveTo(x, height - bottomMargin - 2);
+            ctx.lineTo(x, height - bottomMargin + 2);
             ctx.stroke();
             const xValue = Math.round(-630 + (i * 1260 / 12));
-            ctx.fillText(`${xValue}`, x - 15, height - 5);
+            ctx.fillText(`${xValue}`, x - 10, height - 2);
         }
+        
         // Draw y-axis ticks and labels for increased range
-        const yTickSpacing = height / 8; // More y ticks for increased range
+        const yTickSpacing = height / 8;
         for (let i = 1; i < 8; i++) {
             const y = height - (i * yTickSpacing);
             ctx.beginPath();
-            ctx.moveTo(18, y);
-            ctx.lineTo(22, y);
+            ctx.moveTo(leftMargin - 2, y);
+            ctx.lineTo(leftMargin + 2, y);
             ctx.stroke();
-            const yValue = Math.round(i * 500 / 8); // Adjusted for y range of 500
-            ctx.fillText(`${yValue}`, 2, y + 4);
+            const yValue = Math.round(i * 500 / 8);
+            ctx.fillText(`${yValue}`, 1, y + 3);
         }
         ctx.restore();
     }
@@ -68,18 +88,26 @@ window.addEventListener('DOMContentLoaded', () => {
     function calculateParabolaLatticeIntersections(a, width, height) {
         const points = [];
         const intersections = [];
+        
+        // Reduced margins for better graph visibility
+        const leftMargin = 10;
+        const bottomMargin = 10;
+        const effectiveWidth = width - leftMargin;
+        const effectiveHeight = height - bottomMargin;
+        
         // Draw the parabola with full x range
         const xMin = -630;
         const xMax = 630;
         for (let x = xMin; x <= xMax; x += 0.5) {
             const y = (x * x) / a;
             // Scale y to fit better in canvas, increased max y range for more intersections
-            if (y >= 0 && y <= 500) { // Increased from 300 to 500
-                const px = x * (width / (xMax - xMin)) + width / 2;
-                const py = height - y * (height / 500); // Adjusted for new y range
+            if (y >= 0 && y <= 500) {
+                const px = leftMargin + (x * (effectiveWidth / (xMax - xMin)) + effectiveWidth / 2);
+                const py = effectiveHeight - y * (effectiveHeight / 500);
                 points.push({ x: px, y: py, origX: x, origY: y });
             }
         }
+        
         // Mathematical formula for lattice intersections
         // For y = x²/a to have integer solutions, we need x² ≡ 0 (mod a)
         // This means x must be divisible by the square-free part of a
@@ -107,8 +135,8 @@ window.addEventListener('DOMContentLoaded', () => {
             const x = k * step;
             const y = (x * x) / a;
             if (Number.isInteger(x) && Number.isInteger(y) && y >= 0 && y <= 500) {
-                const px = x * (width / (xMax - xMin)) + width / 2;
-                const py = height - y * (height / 500);
+                const px = leftMargin + (x * (effectiveWidth / (xMax - xMin)) + effectiveWidth / 2);
+                const py = effectiveHeight - y * (effectiveHeight / 500);
                 intersections.push({ x: px, y: py, origX: x, origY: y });
             }
         }
@@ -131,6 +159,7 @@ window.addEventListener('DOMContentLoaded', () => {
     function drawParabola(ctx, a, color, width, height) {
         const { points, intersections } = calculateParabolaLatticeIntersections(a, width, height);
         if (points.length === 0) return { points: [], intersections: [] };
+        
         ctx.beginPath();
         ctx.moveTo(points[0].x, points[0].y);
         points.forEach(point => {
@@ -139,15 +168,34 @@ window.addEventListener('DOMContentLoaded', () => {
         ctx.strokeStyle = color;
         ctx.lineWidth = 2;
         ctx.stroke();
-        // Draw intersection points and labels
+        
+        // Draw smaller intersection points and labels
         intersections.forEach(pt => {
             ctx.beginPath();
-            ctx.arc(pt.x, pt.y, 5, 0, 2 * Math.PI);
+            ctx.arc(pt.x, pt.y, 2.5, 0, 2 * Math.PI); // Reduced from 5 to 2.5
             ctx.fillStyle = 'red';
             ctx.fill();
-            ctx.font = '12px Arial';
+            
+            // Smaller font for labels
+            ctx.font = '8px Arial'; // Reduced from 12px to 8px
             ctx.fillStyle = 'black';
-            ctx.fillText(`(${Math.round(pt.origX)}, ${Math.round(pt.origY)})`, pt.x + 6, pt.y - 6);
+            
+            const label = `(${Math.round(pt.origX)}, ${Math.round(pt.origY)})`;
+            const labelWidth = ctx.measureText(label).width;
+            
+            // Position labels: negative x on left, positive x on right
+            let labelX, labelY;
+            if (pt.origX < 0) {
+                // Negative x: position label to the left of the point
+                labelX = pt.x - labelWidth - 5;
+                labelY = pt.y - 4;
+            } else {
+                // Positive x: position label to the right of the point
+                labelX = pt.x + 4;
+                labelY = pt.y - 4;
+            }
+            
+            ctx.fillText(label, labelX, labelY);
         });
         return { points, intersections };
     }
@@ -228,17 +276,17 @@ window.addEventListener('DOMContentLoaded', () => {
                 drawAxes(ctx, canvas.width, canvas.height);
                 const { points, intersections } = drawParabola(ctx, a, colors[idx % colors.length], canvas.width, canvas.height);
                 
-                // Add formula and info
+                // Add formula and info with improved font sizes
                 const formula = document.createElement('div');
-                formula.innerHTML = `<b style="color:${colors[idx % colors.length]}">y = x² / ${a}</b><br><span style="color:#333;font-size:11px;">√a = ${Math.sqrt(a) % 1 === 0 ? Math.sqrt(a) : Math.sqrt(a).toFixed(2)}</span>`;
+                formula.innerHTML = `<b style="color:${colors[idx % colors.length]}">y = x² / ${a}</b><br><span style="color:#333;font-size:10px;">√a = ${Math.sqrt(a) % 1 === 0 ? Math.sqrt(a) : Math.sqrt(a).toFixed(2)}</span>`;
                 formula.style.textAlign = 'center';
                 formula.style.marginTop = '5px';
-                formula.style.fontSize = '12px';
+                formula.style.fontSize = '11px'; // Slightly reduced from 12px
                 card.appendChild(formula);
                 
-                // Add intersection count
+                // Add intersection count with improved styling
                 const count = document.createElement('div');
-                count.innerHTML = `<span style="color:#666;font-size:10px;">${intersections.length} intersections</span>`;
+                count.innerHTML = `<span style="color:#666;font-size:9px;">${intersections.length} intersections</span>`;
                 count.style.textAlign = 'center';
                 count.style.marginTop = '2px';
                 card.appendChild(count);
@@ -279,11 +327,12 @@ window.addEventListener('DOMContentLoaded', () => {
                 drawAxes(ctx, canvas.width, canvas.height);
                 const { points, intersections } = drawParabola(ctx, a, colors[idx % colors.length], canvas.width, canvas.height);
                 
-                // Add formula and range
+                // Add formula and range with improved typography
                 const formula = document.createElement('div');
-                formula.innerHTML = `<b style="color:${colors[idx % colors.length]}">y = x² / ${a}</b><br><span style="color:#333;font-size:13px;">√a = ${Math.sqrt(a) % 1 === 0 ? Math.sqrt(a) : Math.sqrt(a).toFixed(2)} | x range: [-1000, 1000]</span>`;
+                formula.innerHTML = `<b style="color:${colors[idx % colors.length]}">y = x² / ${a}</b><br><span style="color:#333;font-size:12px;">√a = ${Math.sqrt(a) % 1 === 0 ? Math.sqrt(a) : Math.sqrt(a).toFixed(2)} | x range: [-1000, 1000]</span>`;
                 formula.style.textAlign = 'center';
                 formula.style.marginTop = '10px';
+                formula.style.fontSize = '14px'; // Slightly reduced from default
                 card.appendChild(formula);
                 
                 // Add intersection values table

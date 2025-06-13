@@ -70,7 +70,7 @@ h2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
-    max-width: 800px;
+    max-width: 90%;
     margin: 0 auto;
 }
 
@@ -99,12 +99,12 @@ h2 {
 .narrow-table-container table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 11px;
+    font-size: 10px; /* Reduced from 11px */
 }
 
 .narrow-table-container th,
 .narrow-table-container td {
-    padding: 3px 6px;
+    padding: 2px 4px; /* Reduced padding */
     border: 1px solid #ccc;
     text-align: center;
 }
@@ -120,8 +120,8 @@ h2 {
 }
 
 .function-card.wide {
-    width: 100%;
-    margin: 20px 0;
+    width: 90%;
+    margin: 20px auto;
     display: block;
     box-sizing: border-box;
     border: 1px solid #ddd;
@@ -135,8 +135,9 @@ h2 {
     width: 100%;
     height: auto;
     display: block;
-    border: 1px solid #eee;
+    border: 1px solid #ddd;
     border-radius: 4px;
+    background-color: #fafafa;
 }
 
 .wide-table-container {
@@ -152,13 +153,13 @@ h2 {
     width: 100%;
     min-width: 600px;
     border-collapse: collapse;
-    font-size: 12px;
+    font-size: 11px; /* Reduced from 12px */
     margin-top: 5px;
 }
 
 .wide-table-container th,
 .wide-table-container td {
-    padding: 4px 8px;
+    padding: 3px 6px; /* Reduced padding */
     border: 1px solid #ccc;
     text-align: center;
     white-space: nowrap;
