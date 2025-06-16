@@ -1,0 +1,263 @@
+/* Enhanced Home Page Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: #333;
+}
+
+#app {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 50px;
+    color: white;
+}
+
+header h1 {
+    font-size: 3.5rem;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.header-description {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 15px auto 0;
+    line-height: 1.6;
+}
+
+/* Featured Section */
+.featured-section {
+    margin-bottom: 60px;
+}
+
+.featured-section h2 {
+    text-align: center;
+    color: white;
+    font-size: 2rem;
+    margin-bottom: 30px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+
+.featured-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.featured-card {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.featured-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.featured-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+.card-icon {
+    font-size: 3rem;
+    flex-shrink: 0;
+}
+
+.card-content h3 {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+    color: #2c3e50;
+}
+
+.card-content .equation {
+    font-family: 'Courier New', monospace;
+    background: #f8f9fa;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: #495057;
+    border-left: 3px solid #667eea;
+    display: inline-block;
+    margin-bottom: 15px;
+}
+
+.card-content p {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.card-stats {
+    display: flex;
+    gap: 15px;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.card-arrow {
+    font-size: 1.5rem;
+    color: #667eea;
+    font-weight: bold;
+    transition: transform 0.3s ease;
+}
+
+.featured-card:hover .card-arrow {
+    transform: translateX(5px);
+}
+
+/* Conics Section */
+.conics-section {
+    margin-bottom: 60px;
+}
+
+.conics-section h2 {
+    text-align: center;
+    color: white;
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+
+.conic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.conic-card h3 {
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+    color: #2c3e50;
+}
+
+/* Tools Section */
+.tools-section {
+    margin-bottom: 60px;
+}
+
+.tools-section h2 {
+    text-align: center;
+    color: white;
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+
+.tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.tool-card {
+    background: rgba(255,255,255,0.95);
+    border-radius: 12px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.tool-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.tool-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+.tool-card h4 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+.tool-card p {
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* Enhanced Footer */
+footer {
+    text-align: center;
+    margin-top: 60px;
+    padding: 40px 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+}
+
+.footer-content p {
+    color: white;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+
+.footer-tech {
+    color: rgba(255,255,255,0.8);
+    font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .featured-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .featured-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 25px;
+    }
+    
+    .conic-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    
+    .tools-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+    
+    header h1 {
+        font-size: 2.5rem;
+    }
+    
+    .header-description {
+        font-size: 1rem;
+    }
+}
